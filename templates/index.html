@@ -1,0 +1,145 @@
+<html>
+  <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        .speech {border: 1px solid #DDD; width: 300px; padding: 0; margin: 0}
+        .speech input {border: 0; width: 240px; display: inline-block; height: 30px;}
+        .speech img {float: right; width: 40px }
+        .textInput img {float: right; width: 40px}
+        .tsp {float: right; width: 60px}
+      </style>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <!--<link rel="stylesheet" type="text/css" href="/static/main.css"> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src='https://code.responsivevoice.org/responsivevoice.js'></script>
+    <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+
+  <!-- Compiled and minified JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+  </head>
+  <body>
+      <div id="background">
+    <div>
+     
+      <div id="chatbox">
+        <p class="botText"><span>Hi! I'm Budgy. Ask me about Budget or GST!</span></p>
+      </div>
+      <div id="userInput">
+        <input id="textInput" type="text" name="msg" placeholder="Message">
+        <input class="waves-effect waves-light btn red" id="buttonInput" type="submit" value="Send">
+        <img onclick="startDictation()" src="//i.imgur.com/cHidSVu.gif" style="cursor:pointer;"/>
+        
+        
+       <!-- <input id="tsp"  type='button' value='🔊 ' onclick='getoutputResponse(); ' style="cursor:pointer;"/> -->
+      </div>
+      
+      
+      <script>
+
+
+
+        function getBotResponse() {
+          var rawText = $("#textInput").val();
+          var userHtml = '<p class="userText"><span>' + rawText + '</span></p>';
+          console.log(rawText)
+          $("#textInput").val("");
+          $("#chatbox").append(userHtml);
+          document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
+          
+          $.get("/get", { msg: rawText }).done(function(data) {
+            
+            console.log(data);
+
+
+
+
+            var strdataout=String(data).split("<img");
+            var strdatanew=strdataout[0]+"<br><br><img"+strdataout[1];
+            var botHtml = '<p class="botText"><span>' +strdatanew+ '</span></p>';
+
+
+            
+            $("#chatbox").append(botHtml);
+            
+            responsiveVoice.speak(data.split("<br>")[0]);
+            var string123 = data,
+            substring123 = "<img";
+            if(string123.indexOf(substring123) != -1)
+            {
+            var strdata=String(data).split("<img");
+            strdata[1]="<img"+strdata[1];
+            console.log(strdata[1]);
+            
+            
+            }
+            document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
+            
+          
+          });
+        }
+        function getoutputResponse() {
+          var rawText = $("#textInput").val();
+          var userHtml = '<p class="userText"><span>' + rawText + '</span></p>';
+          // console.log(rawText)
+          $("#textInput").val("");
+          $.get("/get", { msg: rawText }).done(function(data) {
+            var botHtml = '<p class="botText"><span>' + data + '</span></p>';
+            // console.log(data);
+            
+          });
+          var strdata=String(data).split("<img");
+            var botHtml = '<p class="botText"><span>' + strdata[0] + '</span></p>';
+            responsiveVoice.speak(strdata[0].split("<br>")[0]);
+        }
+        $("#textInput").keypress(function(e) {
+            if(e.which == 13) {
+                getBotResponse();
+            }
+        });
+        $("#buttonInput").click(function() {
+          getBotResponse();
+        })
+      </script>
+      <!-- <form id="labnol" method="get" action="javascript:getBotResponse();">
+  <div class="speech">
+    <input type="text" name="q" id="transcript" placeholder="Speak" />
+    <img onclick="startDictation()" src="//i.imgur.com/cHidSVu.gif" />
+  </div>
+</form> -->
+
+<!-- HTML5 Speech Recognition API -->
+<script>
+  function startDictation() {
+
+    if (window.hasOwnProperty('webkitSpeechRecognition')) {
+
+      var recognition = new webkitSpeechRecognition();
+
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.lang = "en-US";
+      recognition.start();
+
+      recognition.onresult = function(e) {
+        document.getElementById('textInput').value
+                                 = e.results[0][0].transcript;
+        recognition.stop();
+         document.getElementById('buttonInput').click(function() {
+          getBotResponse();
+        });
+      };
+
+      recognition.onerror = function(e) {
+        recognition.stop();
+      }
+
+    }
+  }
+</script>
+    </div>
+  </div>
+
+  </body>
+</html>
